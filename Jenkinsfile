@@ -1,31 +1,25 @@
-pipeline {
-  agent any
+stage('Install kubectl') {
+  steps {
+    sh '''
+      set -e
+      cd "$WORKSPACE"
 
-  stages {
+      # Download kubectl to workspace
+      KVER=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+      curl -L -o kubectl "https://dl.k8s.io/release/${KVER}/bin/linux/amd64/kubectl"
+      chmod +x kubectl
 
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
-    }
+      ./kubectl version --client=true
+    '''
+  }
+}
 
-    stage('Install kubectl') {
-      steps {
-        sh '''
-          set -e
-          cd "$WORKSPACE"
-          curl -fsSLO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          ./kubectl version --client=true
-        '''
-      }
-    }
-
-    stage('Deploy K8s YAMLs') {
-      steps {
-        sh './kubectl apply -f mysql-pv.yaml'
-      }
-    }
-
+stage('Deploy K8s YAMLs') {
+  steps {
+    sh '''
+      set -e
+      cd "$WORKSPACE"
+      ./kubectl apply -f mysql-pv.yaml
+    '''
   }
 }
