@@ -1,22 +1,29 @@
 pipeline {
   agent any
-
   stages {
-    stage('Checkout') {
-      steps { checkout scm }
-    }
+    stage('Checkout') { steps { checkout scm } }
 
-    stage('Show files') {
-      steps {
-        sh 'ls -la'
-      }
-    }
-
-    stage('Deploy to Kubernetes') {
+    stage('Deploy K8s YAMLs') {
       steps {
         sh '''
-          chmod +x deploy.sh
-          ./deploy.sh
+          ls -la
+          kubectl apply -f mysql-pv.yaml
+          kubectl apply -f mysql-pvc.yaml
+          kubectl apply -f mysql-configmap.yaml
+          kubectl apply -f mysql-deployment.yaml
+
+          kubectl apply -f nexus-deployment.yaml
+          kubectl apply -f nexus-service.yaml
+
+          kubectl apply -f jenkins-deployment.yaml
+          kubectl apply -f jenkins-service.yaml
+
+          kubectl apply -f webapp-configmap.yaml
+          kubectl apply -f webapp-deployment.yaml
+          kubectl apply -f webapp-service.yaml
+
+          kubectl get pods -o wide
+          kubectl get svc
         '''
       }
     }
