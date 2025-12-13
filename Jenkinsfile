@@ -14,7 +14,7 @@ pipeline {
         sh '''
           set -e
           cd "$WORKSPACE"
-          curl -sLO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          curl -fsSLO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           ./kubectl version --client=true
         '''
